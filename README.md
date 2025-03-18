@@ -1,5 +1,25 @@
 # Smart Drone
 
+## Deutsche Version
+
+### Idee
+
+Das Smart-Drone-Projekt soll die Sicherheit in verschiedenen Situationen verbessern, beispielsweise in dunklen Nächten oder bei Bankautomatensprengungen. Ziel ist es, Opfer zu schützen, indem eine autonome Drohne auf Notrufe reagiert.
+
+### Funktionsweise
+
+1. **Notruf-Auslösung**: Das Opfer oder der Geldautomat sendet einen Notruf über eine App auf Smartphones oder Smartwatches.
+2. **Drohneneinsatz**: Eine Drohne fliegt automatisch zum Opfer und benachrichtigt gleichzeitig die nächstgelegene Polizeidienststelle mit den Echtzeit-Koordinaten.
+3. **Vorfallbewertung**: Nach Ankunft wird der Live-Video-Feed von einem Supervisor manuell überprüft, um festzustellen, ob es sich um einen Fehlalarm oder einen echten Notfall handelt.
+4. **Bedrohungsanalyse**: Falls eine Waffe erkannt wird, zieht sich die Drohne unauffällig zurück, um den Angreifer nicht zu warnen und die Sicherheit des Opfers zu gewährleisten. Die Polizei erhält diese wichtigen Informationen sofort.
+5. **Verfolgung des Angreifers**: Falls der Angreifer mit einem Fahrzeug flieht, verfolgt die Drohne das Auto und sendet kontinuierlich die Koordinaten an die Polizei. Dies ist besonders hilfreich bei der Verfolgung von Bankautomatendieben.
+
+### Proof of Concept
+
+Dies ist aktuell nur ein Konzept.
+
+---
+
 ## English Version
 
 ### Idea
@@ -18,22 +38,4 @@ The Smart Drone project aims to enhance security in various situations, such as 
 
 This concept is currently in the proof-of-concept stage.
 
----
 
-## Deutsche Version
-
-### Idee
-
-Das Smart-Drone-Projekt soll die Sicherheit in verschiedenen Situationen verbessern, beispielsweise in dunklen Nächten oder bei Bankautomatensprengungen. Ziel ist es, Opfer zu schützen, indem eine autonome Drohne auf Notrufe reagiert.
-
-### Funktionsweise
-
-1. **Notruf-Auslösung**: Das Opfer oder der Geldautomat sendet einen Notruf über eine App auf Smartphones oder Smartwatches.
-2. **Drohneneinsatz**: Eine Drohne fliegt automatisch zum Opfer und benachrichtigt gleichzeitig die nächstgelegene Polizeidienststelle mit den Echtzeit-Koordinaten.
-3. **Vorfallbewertung**: Nach Ankunft wird der Live-Video-Feed von einem Supervisor manuell überprüft, um festzustellen, ob es sich um einen Fehlalarm oder einen echten Notfall handelt.
-4. **Bedrohungsanalyse**: Falls eine Waffe erkannt wird, zieht sich die Drohne unauffällig zurück, um den Angreifer nicht zu warnen und die Sicherheit des Opfers zu gewährleisten. Die Polizei erhält diese wichtigen Informationen sofort.
-5. **Verfolgung des Angreifers**: Falls der Angreifer mit einem Fahrzeug flieht, verfolgt die Drohne das Auto und sendet kontinuierlich die Koordinaten an die Polizei. Dies ist besonders hilfreich bei der Verfolgung von Bankautomatendieben.
-
-### Proof of Concept
-
-Dies ist aktuell nur ein Konzept.
