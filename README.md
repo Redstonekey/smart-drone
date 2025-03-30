@@ -56,7 +56,7 @@ drone.land()
 drone.disarm()
 ```
 
-## English Version
+## English version of the idea
 
 ### Idea
 
@@ -74,11 +74,7 @@ The Smart Drone project aims to enhance security in various situations, such as 
 
 This concept is currently in the proof-of-concept stage.
 
---------------------------------------------------------------
-
-## Deutsche Version
-
-### Idee
+## Deutsche Version der Idee
 
 Das Smart-Drone-Projekt soll die Sicherheit in verschiedenen Situationen verbessern, beispielsweise in dunklen Nächten oder bei Bankautomatensprengungen. Ziel ist es, Opfer zu schützen, indem eine autonome Drohne auf Notrufe reagiert.
 
