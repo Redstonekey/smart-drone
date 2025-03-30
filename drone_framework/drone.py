@@ -23,6 +23,8 @@ class drone():
 
 
     def arm(self):
+        if self.flying == True:
+            print(f"{Fore.RED}{self.name} is already in the air.{Style.RESET_ALL}")
         motor.all_motors(self.hover_speed - 10)
         self.armed = True
         self.start_postionx = self.positionx
@@ -44,6 +46,8 @@ class drone():
 
 
     def take_off(self, height: float = 5):
+        if self.flying == True:
+            print(f"{Fore.RED}{self.name} is already in the air.{Style.RESET_ALL}")
         if self.armed == False:
             print(f"{Fore.RED}{self.name} must be armed before take off.{Style.RESET_ALL}")
             return
@@ -70,6 +74,9 @@ class drone():
 
     #fake land function for testing purposes
     def land(self):
+        if self.flying == False:
+            print(f"{Fore.RED}{self.name} must be in the air to land.{Style.RESET_ALL}")
+            return
         self.landed = True
         print(f"{Fore.YELLOW}{self.name} is landing.{Style.RESET_ALL}")
         while self.ground_distance > 1:
@@ -84,6 +91,9 @@ class drone():
 
     def fly(self, x: float, y: float, z: float):
         """Fly to the specified coordinates (x, y, z)"""
+        if self.flying == False:
+            print(f"{Fore.RED}{self.name} must be in the air to fly.{Style.RESET_ALL}")
+            return
         # Not working yet
         print(f"{self.name} is flying to coordinates ({x}, {y}, {z}).")
 
@@ -91,7 +101,7 @@ class drone():
         return
 
     def return_to_home(self):
-        if self.landed == False:
+        if self.flying == False:
             print(f"{Fore.RED}{self.name} must be landed before returning to home.{Style.RESET_ALL}")
             return
         print(f"{Fore.YELLOW}{self.name} is returning to home position ({self.start_postion}).")
@@ -109,4 +119,20 @@ class drone():
         return
 
     def emergency_stop(self):
+        if self.flying == False:
+            print(f"{Fore.RED}{self.name} must be in the air to stop.{Style.RESET_ALL}")
+            return
+        return
+
+        return
+    def emergency_land(self):
+        if self.flying == False:
+            print(f"{Fore.RED}{self.name} must be in the air to land.{Style.RESET_ALL}")
+            return
+        motor.all_motors(0)
+        self.land()
+        self.disarm()
+        self.landed = True
+        self.flying = False
+        print(f"{Fore.GREEN}{self.name} has landed in {Fore.RED}emergency{Fore.GREEN} mode.{Style.RESET_ALL}")
         return
