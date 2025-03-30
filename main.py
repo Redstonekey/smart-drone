@@ -1,8 +1,7 @@
-from drone.drone import drone
-import time
+from drone_framework import drone
 
-drone = drone('drone', 5)
+test = drone('drone', 5)
 
-drone.arm()
-drone.land()
-drone.disarm()
+test.arm()
+test.land()
+test.disarm()
