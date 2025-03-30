@@ -1,4 +1,80 @@
-# Smart Drone
+# Smart Drone Documentation
+
+## Initialization:
+```python
+drone = drone(name: float, hover_speed: float)
+```
+
+## Basic Operations
+
+1. **Arming**
+```python
+drone.arm()
+```
+- Sets initial hover speed
+- Updates starting position
+- Enables drone for flight
+
+2. **Disarming**
+```python
+drone.disarm()
+```
+- Safety checks (must be landed)
+- Stops all motors
+- Prevents accidental operation
+
+5. **Taking off**
+```python
+drone.take_off(hight)
+```
+- pass hight as float
+- Requires armed status check
+- Moves drone to specified height
+- Maintains hover speed at altitude
+
+4. **Landing**
+```python
+drone.land()
+```
+- Gradual descent control
+- Ground distance monitoring
+- Safe landing sequence
+
+
+## Usage Example
+
+```python
+from drone.drone import drone
+
+# Initialize drone with name and hover speed
+drone = drone('drone1', 5)
+
+# Basic flight sequence
+drone.arm()
+drone.take_off()  # Default height: 5m
+drone.land()
+drone.disarm()
+```
+
+## English Version
+
+### Idea
+
+The Smart Drone project aims to enhance security in various situations, such as during nighttime or in cases of ATM robberies ("Bankautomatensprängung"). The goal is to protect victims by deploying an autonomous drone that responds to emergency calls.
+
+### How It Works
+
+1. **Emergency Activation**: The victim or the ATM triggers a distress call e.g. through an app on phones or smartwatches.
+2. **Drone Deployment**: A drone autonomously flies to the victim's location while simultaneously notifying the nearest police station with real-time coordinates.
+3. **Incident Assessment**: Upon arrival, a live video feed is manually reviewed by a supervisor to confirm whether it was a false alarm or a real emergency.
+4. **Threat Evaluation**: If a weapon is detected, the drone discreetly backs off to avoid alerting the attacker, ensuring the victim's safety. The police receive this critical information immediately.
+5. **Tracking the Attacker**: If the attacker flees by car, the drone follows the vehicle, continuously reporting its coordinates to law enforcement. This feature is particularly useful for tracking ATM robbers attempting to escape.
+
+### Proof of Concept
+
+This concept is currently in the proof-of-concept stage.
+
+--------------------------------------------------------------
 
 ## Deutsche Version
 
@@ -19,23 +95,5 @@ Das Smart-Drone-Projekt soll die Sicherheit in verschiedenen Situationen verbess
 Dies ist aktuell nur ein Konzept.
 
 ---
-
-## English Version
-
-### Idea
-
-The Smart Drone project aims to enhance security in various situations, such as during nighttime or in cases of ATM robberies ("Bankautomatensprängung"). The goal is to protect victims by deploying an autonomous drone that responds to emergency calls.
-
-### How It Works
-
-1. **Emergency Activation**: The victim or the ATM triggers a distress call e.g. through an app on phones or smartwatches.
-2. **Drone Deployment**: A drone autonomously flies to the victim's location while simultaneously notifying the nearest police station with real-time coordinates.
-3. **Incident Assessment**: Upon arrival, a live video feed is manually reviewed by a supervisor to confirm whether it was a false alarm or a real emergency.
-4. **Threat Evaluation**: If a weapon is detected, the drone discreetly backs off to avoid alerting the attacker, ensuring the victim's safety. The police receive this critical information immediately.
-5. **Tracking the Attacker**: If the attacker flees by car, the drone follows the vehicle, continuously reporting its coordinates to law enforcement. This feature is particularly useful for tracking ATM robbers attempting to escape.
-
-### Proof of Concept
-
-This concept is currently in the proof-of-concept stage.
 
 
