@@ -18,6 +18,7 @@ class drone():
         self.hover_speed = hover_speed
         self.armed = False
         self.landed = True  # Start as landed
+        self.flying = False
         self.ground_distance = 10 # Get from Camera later @deyan
 
 
@@ -50,16 +51,19 @@ class drone():
         while self.positiony < self.start_postiony + height:
             motor.all_motors(100)
         motor.all_motors(self.hover_speed)
+        self.landed = False
+        self.flying = True
         print(f"{Fore.GREEN}{self.name} is in the air at {height}m.{Style.RESET_ALL}")
 
     # real land function        
     # def land(self):
-    #     self.landed = True
     #     print(f"{Fore.YELLOW}{self.name} is landing.{Style.RESET_ALL}")
     #     while self.ground_distance > 1:
     #         motor.all_motors(self.hover_speed - 10)
     #     if self.ground_distance < 1:
     #         motor.all_motors(self.hover_speed - 20)
+    #         self.landed = True
+    #         self.flying = False
     #         print(f"{Fore.GREEN}{self.name} has landed.{Style.RESET_ALL}")
     #         print(f"{Fore.LIGHTBLACK_EX}({self.name} still needs to disarm.){Style.RESET_ALL}")
 
@@ -82,3 +86,27 @@ class drone():
         """Fly to the specified coordinates (x, y, z)"""
         # Not working yet
         print(f"{self.name} is flying to coordinates ({x}, {y}, {z}).")
+
+    def get_battery_status(self):
+        return
+
+    def return_to_home(self):
+        if self.landed == False:
+            print(f"{Fore.RED}{self.name} must be landed before returning to home.{Style.RESET_ALL}")
+            return
+        print(f"{Fore.YELLOW}{self.name} is returning to home position ({self.start_postion}).")
+        self.fly(self.start_postionx, self.start_postiony, self.start_postionz)
+        self.land()
+        self.disarm()
+        return
+
+    def hover(self):
+        if self.flying == False:
+            print(f"{Fore.RED}{self.name} must be in the air to hover.{Style.RESET_ALL}")
+            return
+        motor.all_motors(self.hover_speed)
+        print(f"{Fore.YELLOW}{self.name} is hovering.{Style.RESET_ALL}")
+        return
+
+    def emergency_stop(self):
+        return
