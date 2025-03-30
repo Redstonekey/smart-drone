@@ -11,20 +11,36 @@
 
 # Rear Left (RL)
 
+import time
+
+
 class motor():
-    def __init__(self, motor_id: str, motor_type: str, max_rpm: float, max_thrust: float):
-        self.motor_id = motor_id
-        self.motor_type = motor_type
-        self.max_rpm = max_rpm
-        self.max_thrust = max_thrust
+    def __init__(self):
+        self.yaw = 0 # Get Yaw from Sensor later @deyan
+        self.pitch = 0 # Get Pitch from Sensor later @deyan
+        self.last_print = 0
+
+    def _rate_limited_print(self, message):
+        current_time = time.time()
+        if current_time - self.last_print >= 1:
+            print(message)
+            self.last_print = current_time
+
     def set_FR(self, strength: float):
-        print(f"Front Right Motor set to {strength} strength.")
+        self._rate_limited_print(f"Front Right Motor set to {strength} strength.")
+
     def set_FL(self, strength: float):
-        print(f"Front Left Motor set to {strength} strength.")
+        self._rate_limited_print(f"Front Left Motor set to {strength} strength.")
+
     def set_RR(self, strength: float):
-        print(f"Rear Right Motor set to {strength} strength.")
+        self._rate_limited_print(f"Rear Right Motor set to {strength} strength.")
+
     def set_RL(self, strength: float):
-        print(f"Rear Left Motor set to {strength} strength.")
+        self._rate_limited_print(f"Rear Left Motor set to {strength} strength.")
+
     def all_motors(self, strength: float):
-        print(f"All Motors set to {strength} strength.")
+        self._rate_limited_print(f"All Motors set to {strength} strength.")
+
+    def set_yaw(self, yaw: float):
+        self._rate_limited_print(f"Yaw set to {yaw} degrees.")
     

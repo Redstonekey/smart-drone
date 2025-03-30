@@ -1,24 +1,24 @@
-from motor import motor
-from gps import GPS
+from .motor import motor
+from .gps import GPS
 from colorama import init, Fore, Style
 init()
-
+motor = motor()
 class drone():
-    def __init__(self, name: str, model: str, max_speed: float, battery_life: float, positionx: float, positiony: float, positionz: float, hover_speed: float):
+    def __init__(self, name: float, hover_speed: float):
         self.name = name
-        self.battery_life = battery_life
-        self.position = GPS.get_position()
-        self.positionx = GPS.get_x()
-        self.positiony = GPS.get_y()
-        self.positionz = GPS.get_z()
-        self.start_postionx = positionx
-        self.start_postiony = positiony
-        self.start_postionz = positionz
-        self.start_postion = positionx, positiony, positionz
+        self.gps = GPS()  # Create GPS instance
+        self.position = self.gps.get_position()  # Use instance method
+        self.positionx = self.gps.get_x()  # Use instance method
+        self.positiony = self.gps.get_y()  # Use instance method
+        self.positionz = self.gps.get_z()  # Use instance method
+        self.start_postionx = self.positionx
+        self.start_postiony = self.positiony
+        self.start_postionz = self.positionz
+        self.start_postion = (self.positionx, self.positiony, self.positionz)
         self.hover_speed = hover_speed
         self.armed = False
-        self.landed = False
-        self.ground_distance = 0 # Get from Camera later @deyan
+        self.landed = True  # Start as landed
+        self.ground_distance = 10 # Get from Camera later @deyan
 
 
     def arm(self):
@@ -28,7 +28,7 @@ class drone():
         self.start_postiony = self.positiony
         self.start_postionz = self.positionz
         self.start_postion = self.position
-        print(f"{self.name} is armed.")
+        print(f"{Fore.GREEN}{self.name} is armed.{Style.RESET_ALL}")
     
     def disarm(self):
         if self.armed == False:
@@ -52,17 +52,31 @@ class drone():
         motor.all_motors(self.hover_speed)
         print(f"{Fore.GREEN}{self.name} is in the air at {height}m.{Style.RESET_ALL}")
 
-        
+    # real land function        
+    # def land(self):
+    #     self.landed = True
+    #     print(f"{Fore.YELLOW}{self.name} is landing.{Style.RESET_ALL}")
+    #     while self.ground_distance > 1:
+    #         motor.all_motors(self.hover_speed - 10)
+    #     if self.ground_distance < 1:
+    #         motor.all_motors(self.hover_speed - 20)
+    #         print(f"{Fore.GREEN}{self.name} has landed.{Style.RESET_ALL}")
+    #         print(f"{Fore.LIGHTBLACK_EX}({self.name} still needs to disarm.){Style.RESET_ALL}")
+
+
+    #fake land function for testing purposes
     def land(self):
         self.landed = True
         print(f"{Fore.YELLOW}{self.name} is landing.{Style.RESET_ALL}")
         while self.ground_distance > 1:
             motor.all_motors(self.hover_speed - 10)
+            self.ground_distance -= 1
+            print(f"{Fore.YELLOW}{self.name} is descending. Current ground distance: {self.ground_distance}m.{Style.RESET_ALL}")
         if self.ground_distance < 1:
             motor.all_motors(self.hover_speed - 20)
             print(f"{Fore.GREEN}{self.name} has landed.{Style.RESET_ALL}")
             print(f"{Fore.LIGHTBLACK_EX}({self.name} still needs to disarm.){Style.RESET_ALL}")
-        
+            
 
     def fly(self, x: float, y: float, z: float):
         """Fly to the specified coordinates (x, y, z)"""
