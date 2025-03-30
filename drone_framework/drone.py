@@ -89,13 +89,13 @@ class drone():
             print(f"{Fore.LIGHTBLACK_EX}({self.name} still needs to disarm.){Style.RESET_ALL}")
             
 
-    def fly(self, x: float, y: float, z: float):
-        """Fly to the specified coordinates (x, y, z)"""
-        if self.flying == False:
-            print(f"{Fore.RED}{self.name} must be in the air to fly.{Style.RESET_ALL}")
-            return
-        # Not working yet
-        print(f"{self.name} is flying to coordinates ({x}, {y}, {z}).")
+    # def fly(self, x: float, y: float, z: float):
+    #     """Fly to the specified coordinates (x, y, z)"""
+    #     if self.flying == False:
+    #         print(f"{Fore.RED}{self.name} must be in the air to fly.{Style.RESET_ALL}")
+    #         return
+    #     # Not working yet
+    #     print(f"{self.name} is flying to coordinates ({x}, {y}, {z}).")
 
     def get_battery_status(self):
         return
@@ -123,8 +123,7 @@ class drone():
             print(f"{Fore.RED}{self.name} must be in the air to stop.{Style.RESET_ALL}")
             return
         return
-
-        return
+    
     def emergency_land(self):
         if self.flying == False:
             print(f"{Fore.RED}{self.name} must be in the air to land.{Style.RESET_ALL}")
@@ -136,3 +135,31 @@ class drone():
         self.flying = False
         print(f"{Fore.GREEN}{self.name} has landed in {Fore.RED}emergency{Fore.GREEN} mode.{Style.RESET_ALL}")
         return
+    class fly():
+        def __init__(self, parent):
+            self.parent = parent
+            
+        def right_forward(self, strength: float):
+            motor.set_FL(strength)
+            motor.set_FR(strength - strength / 4)
+            motor.set_RR(strength)
+            motor.set_RL(strength)
+            return
+        def right_backward(self, strength: float):
+            motor.set_FL(strength)
+            motor.set_FR(strength)
+            motor.set_RR(strength - strength / 4)
+            motor.set_RL(strength)
+            return
+        def left_forward(self, strength: float):
+            motor.set_FL(strength - strength / 4)
+            motor.set_FR(strength)
+            motor.set_RR(strength)
+            motor.set_RL(strength)
+            return
+        def left_backward(self, strength: float):
+            motor.set_FL(strength)
+            motor.set_FR(strength)
+            motor.set_RR(strength)
+            motor.set_RL(strength - strength / 4)
+            return
