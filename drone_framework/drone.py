@@ -1,3 +1,4 @@
+import math
 from .motor import motor
 from .gps import GPS
 from colorama import init, Fore, Style
@@ -215,3 +216,30 @@ class drone():
             motor.set_RR(strength- strength / 4)
             motor.set_RL(strength)
             return
+        def move(strength: float, direction: float = 0.0):
+            # idk if it works lmao (used deepseek)
+        
+            # Convert direction to radians (0.0 = forward, 0.25 = right, etc.)
+            angle = direction * 2 * 3.14159  # Convert to radians (0-2π)
+            
+            # Calculate X (left/right) and Y (forward/backward) components
+            x = -math.sin(angle)  # -1 (left) to +1 (right)
+            y = math.cos(angle)   # -1 (backward) to +1 (forward)
+            
+            # Motor mixing (FL, FR, RR, RL)
+            fl = strength + (x * strength * 0.5) - (y * strength * 0.5)
+            fr = strength - (x * strength * 0.5) - (y * strength * 0.5)
+            rr = strength - (x * strength * 0.5) + (y * strength * 0.5)
+            rl = strength + (x * strength * 0.5) + (y * strength * 0.5)
+            
+            # Constrain motor values (0.0 to 1.0)
+            fl = max(0.0, min(1.0, fl))
+            fr = max(0.0, min(1.0, fr))
+            rr = max(0.0, min(1.0, rr))
+            rl = max(0.0, min(1.0, rl))
+            
+            # Apply to motors
+            motor.set_FL(fl)
+            motor.set_FR(fr)
+            motor.set_RR(rr)
+            motor.set_RL(rl)
