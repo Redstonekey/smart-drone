@@ -1,7 +1,15 @@
-from drone_framework import drone
+from drone_framework.drone import drone
+drone = drone('drone', 5)
 
-test = drone('drone', 5)
-
-test.arm()
-test.land()
-test.disarm()
+drone.arm()
+drone.fake_take_off(5)
+drone.fly.forward(drone, 10)
+drone.fly.right(drone, 10)
+drone.fly.left(drone, 10)
+drone.fly.backward(drone, 10)
+drone.fly.right_forward(drone, 10)
+drone.fly.left_backward(drone, 10)
+drone.fly.right_backward(drone, 10)
+drone.fly.left_forward(drone, 10)
+drone.fake_land()
+drone.disarm()

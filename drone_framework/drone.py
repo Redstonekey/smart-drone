@@ -58,21 +58,46 @@ class drone():
         self.landed = False
         self.flying = True
         print(f"{Fore.GREEN}{self.name} is in the air at {height}m.{Style.RESET_ALL}")
+        return
+    
+    def fake_take_off(self, height: float = 5):
+        if self.flying == True:
+            print(f"{Fore.RED}{self.name} is already in the air.{Style.RESET_ALL}")
+        if self.armed == False:
+            print(f"{Fore.RED}{self.name} must be armed before take off.{Style.RESET_ALL}")
+            return
+        print(f"{Fore.YELLOW}{self.name} is taking off to {height} meters.{Style.RESET_ALL}")
+        while self.positiony < self.start_postiony + height:
+            motor.all_motors(100)
+            self.ground_distance += 1
+            self.positiony += 1
+        motor.all_motors(self.hover_speed)
+        self.landed = False
+        self.flying = True
+        print(f"{Fore.GREEN}{self.name} is in the air at {height}m.{Style.RESET_ALL}")
+        self.flying = True
+        self.landed = False
+        return
 
-    # real land function        
-    # def land(self):
-    #     print(f"{Fore.YELLOW}{self.name} is landing.{Style.RESET_ALL}")
-    #     while self.ground_distance > 1:
-    #         motor.all_motors(self.hover_speed - 10)
-    #     if self.ground_distance < 1:
-    #         motor.all_motors(self.hover_speed - 20)
-    #         self.landed = True
-    #         self.flying = False
-    #         print(f"{Fore.GREEN}{self.name} has landed.{Style.RESET_ALL}")
-    #         print(f"{Fore.LIGHTBLACK_EX}({self.name} still needs to disarm.){Style.RESET_ALL}")
+#    real land function        
+    def fake_land(self):
+        print(f"{Fore.YELLOW}{self.name} is landing.{Style.RESET_ALL}")
+        while self.ground_distance > 1:
+            motor.all_motors(self.hover_speed - 10)
+            self.ground_distance -= 1
+            self.positiony -= 1
+        if self.ground_distance < 1:
+            motor.all_motors(self.hover_speed - 20)
+            self.landed = True
+            self.flying = False
+            print(f"{Fore.GREEN}{self.name} has landed.{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTBLACK_EX}({self.name} still needs to disarm.){Style.RESET_ALL}")
+        self.landed = True
+        self.flying = False
+        return
 
 
-    #fake land function for testing purposes
+#fake land function for testing purposes
     def land(self):
         if self.flying == False:
             print(f"{Fore.RED}{self.name} must be in the air to land.{Style.RESET_ALL}")
@@ -87,6 +112,8 @@ class drone():
             motor.all_motors(self.hover_speed - 20)
             print(f"{Fore.GREEN}{self.name} has landed.{Style.RESET_ALL}")
             print(f"{Fore.LIGHTBLACK_EX}({self.name} still needs to disarm.){Style.RESET_ALL}")
+        self.landed = True
+        self.flying = False
             
 
     # def fly(self, x: float, y: float, z: float):
@@ -135,6 +162,7 @@ class drone():
         self.flying = False
         print(f"{Fore.GREEN}{self.name} has landed in {Fore.RED}emergency{Fore.GREEN} mode.{Style.RESET_ALL}")
         return
+    
     class fly():
         def __init__(self, parent):
             self.parent = parent
@@ -162,4 +190,28 @@ class drone():
             motor.set_FR(strength)
             motor.set_RR(strength)
             motor.set_RL(strength - strength / 4)
+            return
+        def forward(self, strength: float):
+            motor.set_FL(strength- strength / 4)
+            motor.set_FR(strength- strength / 4)
+            motor.set_RR(strength)
+            motor.set_RL(strength)
+            return
+        def backward(self, strength: float):
+            motor.set_FL(strength)
+            motor.set_FR(strength)
+            motor.set_RR(strength- strength / 4)
+            motor.set_RL(strength- strength / 4)
+            return
+        def right(self, strength: float):
+            motor.set_FL(strength)
+            motor.set_FR(strength- strength / 4)
+            motor.set_RR(strength)
+            motor.set_RL(strength- strength / 4)
+            return
+        def left(self, strength: float):
+            motor.set_FL(strength- strength / 4)
+            motor.set_FR(strength)
+            motor.set_RR(strength- strength / 4)
+            motor.set_RL(strength)
             return
