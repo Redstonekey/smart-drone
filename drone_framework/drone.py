@@ -2,6 +2,7 @@ import math
 from .motor import motor
 from .gps import GPS
 from colorama import init, Fore, Style
+import time
 init()
 motor = motor()
 class drone():
@@ -12,6 +13,7 @@ class drone():
         self.positionx = self.gps.get_x()  # Use instance method
         self.positiony = self.gps.get_y()  # Use instance method
         self.positionz = self.gps.get_z()  # Use instance method
+        self.fly = self.fly(self)  # Initialize fly class with parent reference
         self.start_postionx = self.positionx
         self.start_postiony = self.positiony
         self.start_postionz = self.positionz
@@ -216,30 +218,23 @@ class drone():
             motor.set_RR(strength- strength / 4)
             motor.set_RL(strength)
             return
-        def move(strength: float, direction: float = 0.0):
-            # idk if it works lmao (used deepseek)
-        
-            # Convert direction to radians (0.0 = forward, 0.25 = right, etc.)
-            angle = direction * 2 * 3.14159  # Convert to radians (0-2π)
-            
-            # Calculate X (left/right) and Y (forward/backward) components
-            x = -math.sin(angle)  # -1 (left) to +1 (right)
-            y = math.cos(angle)   # -1 (backward) to +1 (forward)
-            
-            # Motor mixing (FL, FR, RR, RL)
-            fl = strength + (x * strength * 0.5) - (y * strength * 0.5)
-            fr = strength - (x * strength * 0.5) - (y * strength * 0.5)
-            rr = strength - (x * strength * 0.5) + (y * strength * 0.5)
-            rl = strength + (x * strength * 0.5) + (y * strength * 0.5)
-            
-            # Constrain motor values (0.0 to 1.0)
-            fl = max(0.0, min(1.0, fl))
-            fr = max(0.0, min(1.0, fr))
-            rr = max(0.0, min(1.0, rr))
-            rl = max(0.0, min(1.0, rl))
-            
-            # Apply to motors
-            motor.set_FL(fl)
-            motor.set_FR(fr)
-            motor.set_RR(rr)
-            motor.set_RL(rl)
+        def rotate_right(rotate_time):
+            start_time = time.time()
+            print(f'{Fore.YELLOW}Drone is rotating to the right for {rotate_time} seconds.{Style.RESET_ALL}')
+            speed_RL = motor.get_speed('RL')
+            speed_RR = motor.get_speed('RR')
+            speed_FR = motor.get_speed('FR')
+            speed_FL = motor.get_speed('FL')
+            while time.time() - start_time < rotate_time:
+                motor.set_FL(speed_FL)
+                motor.set_FR(speed_FR- (motor.get_speed('FR') * 0.3))
+                motor.set_RR(speed_RR)
+                motor.set_RL(speed_RL - (motor.get_speed('RL') * 0.3))
+            motor.set_FL(speed_FL)
+            motor.set_FR(speed_FR)
+            motor.set_RR(speed_RR)
+            motor.set_RL(speed_RL)
+            print(f'{Fore.GREEN}Drone stopped rotating.{Style.RESET_ALL}')
+            return
+
+

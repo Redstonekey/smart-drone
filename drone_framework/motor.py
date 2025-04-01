@@ -55,3 +55,15 @@ class motor():
 
     def set_yaw(self, yaw: float):
         self._rate_limited_print(f"Yaw set to {yaw} degrees.")
+    def get_speed(motor):
+        if motor == 'FL':
+            speed = 1
+        elif motor == 'FR':
+            speed = 2
+        elif motor == 'RL':
+            speed = 3
+        elif motor == 'RR':
+            speed = 4
+        else:
+            return ValueError
+        return speed
