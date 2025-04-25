@@ -5,7 +5,7 @@ from colorama import init, Fore, Style
 import time
 init()
 motor = motor()
-class drone():
+class Drone():
     def __init__(self, name: float, hover_speed: float):
         self.name = name
         self.gps = GPS()  # Create GPS instance
@@ -34,7 +34,7 @@ class drone():
         self.start_postiony = self.positiony
         self.start_postionz = self.positionz
         self.start_postion = self.position
-        print(f"{Fore.GREEN}{self.name} is armed.{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}{self.name} is armed.{Style.RESET_ALL}")    
     
     def disarm(self):
         if self.armed == False:

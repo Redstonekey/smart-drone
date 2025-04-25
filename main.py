@@ -1,5 +1,6 @@
-from drone_framework.drone import drone
-drone = drone('drone', 5)
+from smart_drone import Drone
+
+drone = Drone('drone', 5)
 
 drone.arm()
 drone.fake_take_off(5)
