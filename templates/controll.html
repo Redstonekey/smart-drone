@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Manual Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --danger: #e63946;
+            --success: #2ecc71;
+            --warning: #f9c74f;
+            --dark: #001845;
+            --gray: #8d99ae;
+            --light: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+            --joystick-size: 120px; /* Size of the joystick base */
+            --joystick-thumb-size: 40px; /* Size of the joystick thumb */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        html, body {
+            background-color: #f1f5f9;
+            color: #334155;
+            height: 100%;
+            width: 100%;
+            overflow: hidden; /* Prevent scrolling */
+            padding: 16px;
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+        }
+
+        .controller-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            width: 100%;
+            height: 100%; /* Fill available height */
+            display: flex;
+            flex-direction: column; /* Arrange sections vertically */
+            gap: 20px;
+            overflow-y: auto; /* Allow vertical scrolling for status if needed */
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--dark);
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .control-section {
+            flex-grow: 1; /* Allow control section to take available space */
+            display: flex;
+            flex-direction: row; /* Arrange joysticks horizontally */
+            justify-content: space-around; /* Space out the joysticks */
+            align-items: center; /* Center joysticks vertically */
+            gap: 20px;
+        }
+
+        .joystick-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px; /* Gap between joystick and description */
+        }
+
+        .joystick-description {
+            font-size: 14px;
+            color: var(--gray);
+            text-align: center;
+        }
+
+
+        .joystick-container {
+            width: var(--joystick-size);
+            height: var(--joystick-size);
+            background-color: #e2e8f0;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .joystick-thumb {
+            width: var(--joystick-thumb-size);
+            height: var(--joystick-thumb-size);
+            background-color: var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            box-shadow: var(--shadow);
+            transition: background-color 0.2s ease, top 0.05s linear, left 0.05s linear; /* Added transition for smooth movement */
+        }
+
+        .joystick-thumb:active {
+            cursor: grabbing;
+            background-color: var(--primary-light);
+        }
+
+        .status-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .status-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e2e8f0;
+            font-size: 14px;
+        }
+
+         .status-item:last-child {
+             border-bottom: none;
+         }
+
+        .status-item-label {
+            color: var(--gray);
+        }
+
+        .status-item-value {
+            font-weight: 600;
+        }
+
+        /* Toggle Switch Styling */
+        .control-mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            justify-content: center; /* Center toggle horizontally */
+        }
+
+        .control-mode-toggle label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+
+         /* Disable joystick when in Auto mode */
+         .joystick-container.disabled {
+             pointer-events: none; /* Prevent mouse/touch events */
+             opacity: 0.6; /* Visually indicate disabled state */
+         }
+    </style>
+</head>
+<body>
+    <div class="controller-container">
+        <h2>Manual Drone Control</h2>
+
+        <div class="control-mode-toggle">
+            <span>Automatic</span>
+            <label class="switch">
+                <input type="checkbox" id="mode-toggle">
+                <span class="slider"></span>
+            </label>
+            <span>Manual</span>
+        </div>
+
+        <div class="control-section">
+            <div class="joystick-group">
+                 <div class="joystick-container" id="left-joystick">
+                    <div class="joystick-thumb" id="left-thumb"></div>
+                </div>
+                <div class="joystick-description">Left: Roll (Left/Right), Pitch (Forward/Backward)</div>
+            </div>
+
+            <div class="joystick-group">
+                <div class="joystick-container" id="right-joystick">
+                    <div class="joystick-thumb" id="right-thumb"></div>
+                </div>
+                 <div class="joystick-description">Right: Yaw (Left/Right), Throttle (Up/Down)</div>
+            </div>
+        </div>
+
+
+        <div class="status-section">
+            <div class="status-title">Current Status</div>
+            <div class="status-item">
+                <span class="status-item-label">Connection:</span>
+                <span class="status-item-value" id="connection-status">Connected</span>
+            </div>
+             <div class="status-item">
+                <span class="status-item-label">Mode:</span>
+                <span class="status-item-value" id="control-mode">Manual</span>
+            </div>
+             <div class="status-item">
+                <span class="status-item-label">Battery:</span>
+                <span class="status-item-value" id="current-battery">72%</span>
+            </div>
+             <div class="status-item">
+                <span class="status-item-label">Pitch:</span>
+                <span class="status-item-value" id="current-pitch">0°</span>
+            </div>
+             <div class="status-item">
+                <span class="status-item-label">Roll:</span>
+                <span class="status-item-value" id="current-roll">0°</span>
+            </div>
+             <div class="status-item">
+                <span class="status-item-label">Throttle:</span>
+                <span class="status-item-value" id="current-throttle">0%</span>
+            </div>
+             <div class="status-item">
+                <span class="status-item-label">Yaw:</span>
+                <span class="status-item-value" id="current-yaw">0°</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Get status elements
+        const connectionStatus = document.getElementById('connection-status');
+        const controlMode = document.getElementById('control-mode');
+        const currentBattery = document.getElementById('current-battery');
+        const currentPitch = document.getElementById('current-pitch');
+        const currentRoll = document.getElementById('current-roll');
+        const currentThrottle = document.getElementById('current-throttle');
+        const currentYaw = document.getElementById('current-yaw');
+
+        // Get joystick elements
+        const leftJoystick = document.getElementById('left-joystick');
+        const leftThumb = document.getElementById('left-thumb');
+        const rightJoystick = document.getElementById('right-joystick');
+        const rightThumb = document.getElementById('right-thumb');
+
+        // Get mode toggle
+        const modeToggle = document.getElementById('mode-toggle');
+
+        // Control values (simulated)
+        const controlValues = {
+            throttle: 0,
+            yaw: 0,
+            pitch: 0,
+            roll: 0
+        };
+
+        // Define control limits
+        const maxPitchRoll = 45; // Max degrees for pitch and roll
+        const maxYaw = 180; // Max degrees for yaw
+        const controlStep = 5; // Step value for keyboard control
+
+        const maxJoystickDistance = (parseFloat(getComputedStyle(leftJoystick).width) - parseFloat(getComputedStyle(leftThumb).width)) / 2;
+
+        let activeThumb = null; // To track which thumb is being dragged
+        let initialThumbX = 0;
+        let initialThumbY = 0;
+        let initialMouseX = 0;
+        let initialMouseY = 0;
+
+        let controlInterval; // To hold the interval for continuous sending
+        let activeInputs = new Set(); // To track active inputs (drag or key presses)
+
+        // Map keyboard keys to control actions
+        const keyMap = {
+            'w': 'pitch-up',
+            's': 'pitch-down',
+            'a': 'roll-left',
+            'd': 'roll-right',
+            ' ': 'throttle-up', // Space key
+            'shift': 'throttle-down',
+            'q': 'yaw-left',
+            'e': 'yaw-right'
+        };
+
+        // Map control actions to joystick thumbs
+        const thumbMap = {
+            'pitch-up': leftThumb,
+            'pitch-down': leftThumb,
+            'roll-left': leftThumb,
+            'roll-right': leftThumb,
+            'throttle-up': rightThumb,
+            'throttle-down': rightThumb,
+            'yaw-left': rightThumb,
+            'yaw-right': rightThumb
+        };
+
+
+        // Add event listeners for touch and mouse
+        leftThumb.addEventListener('touchstart', dragStart);
+        leftThumb.addEventListener('mousedown', dragStart);
+        rightThumb.addEventListener('touchstart', dragStart);
+        rightThumb.addEventListener('mousedown', dragStart);
+
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchend', dragEnd);
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('mouseleave', dragEnd); // Handle mouse leaving window while dragging
+
+        // Add event listeners for keyboard
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+
+
+        // Event listener for the mode toggle
+        modeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                controlMode.textContent = 'Manual';
+                leftJoystick.classList.remove('disabled');
+                rightJoystick.classList.remove('disabled');
+                 // If switching to manual, start the interval if there are active inputs
+                if (activeInputs.size > 0 && !controlInterval) {
+                     controlInterval = setInterval(sendControlData, 100);
+                }
+            } else {
+                controlMode.textContent = 'Automatic';
+                // Reset control values and stop sending data when switching to Auto
+                controlValues.throttle = 0;
+                controlValues.yaw = 0;
+                controlValues.pitch = 0;
+                controlValues.roll = 0;
+                updateStatusDisplay();
+                clearInterval(controlInterval);
+                controlInterval = null;
+                 // Snap thumbs back to center
+                leftThumb.style.left = '50%';
+                leftThumb.style.top = '50%';
+                leftThumb.style.transform = 'translate(-50%, -50%)';
+                rightThumb.style.left = '50%';
+                rightThumb.style.top = '50%';
+                rightThumb.style.transform = 'translate(-50%, -50%)';
+
+                leftJoystick.classList.add('disabled');
+                rightJoystick.classList.add('disabled');
+                activeInputs.clear(); // Clear all active inputs
+            }
+        });
+
+        function handleKeyDown(event) {
+            // Only process keydown if in Manual mode and not a modifier key or repeat
+            if (controlMode.textContent === 'Automatic' || event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
+
+            const key = event.key.toLowerCase();
+            const inputAction = keyMap[key];
+
+            if (inputAction && !activeInputs.has(inputAction)) {
+                activeInputs.add(inputAction);
+
+                // Determine target thumb and movement based on active inputs
+                let targetThumb = null;
+                let moveX = 0;
+                let moveY = 0;
+
+                // Left Joystick (Pitch/Roll)
+                if (activeInputs.has('pitch-up') && activeInputs.has('roll-left')) { targetThumb = leftThumb; moveX = -1; moveY = -1; }
+                else if (activeInputs.has('pitch-up') && activeInputs.has('roll-right')) { targetThumb = leftThumb; moveX = 1; moveY = -1; }
+                else if (activeInputs.has('pitch-down') && activeInputs.has('roll-left')) { targetThumb = leftThumb; moveX = -1; moveY = 1; }
+                else if (activeInputs.has('pitch-down') && activeInputs.has('roll-right')) { targetThumb = leftThumb; moveX = 1; moveY = 1; }
+                else if (activeInputs.has('pitch-up')) { targetThumb = leftThumb; moveY = -1; }
+                else if (activeInputs.has('pitch-down')) { targetThumb = leftThumb; moveY = 1; }
+                else if (activeInputs.has('roll-left')) { targetThumb = leftThumb; moveX = -1; }
+                else if (activeInputs.has('roll-right')) { targetThumb = leftThumb; moveX = 1; }
+
+                // Right Joystick (Throttle/Yaw)
+                else if (activeInputs.has('throttle-up') && activeInputs.has('yaw-left')) { targetThumb = rightThumb; moveX = -1; moveY = -1; }
+                else if (activeInputs.has('throttle-up') && activeInputs.has('yaw-right')) { targetThumb = rightThumb; moveX = 1; moveY = -1; }
+                else if (activeInputs.has('throttle-down') && activeInputs.has('yaw-left')) { targetThumb = rightThumb; moveX = -1; moveY = 1; }
+                else if (activeInputs.has('throttle-down') && activeInputs.has('yaw-right')) { targetThumb = rightThumb; moveX = 1; moveY = 1; }
+                else if (activeInputs.has('throttle-up')) { targetThumb = rightThumb; moveY = -1; }
+                else if (activeInputs.has('throttle-down')) { targetThumb = rightThumb; moveY = 1; }
+                else if (activeInputs.has('yaw-left')) { targetThumb = rightThumb; moveX = -1; }
+                else if (activeInputs.has('yaw-right')) { targetThumb = rightThumb; moveX = 1; }
+
+
+                // Visually move the joystick thumb if a target thumb was identified
+                if (targetThumb) {
+                    const centerX = targetThumb.parentElement.offsetWidth / 2;
+                    const centerY = targetThumb.parentElement.offsetHeight / 2;
+                    const newX = centerX + moveX * maxJoystickDistance;
+                    const newY = centerY + moveY * maxJoystickDistance;
+
+                    targetThumb.style.left = newX + 'px';
+                    targetThumb.style.top = newY + 'px';
+                     // Remove transform to avoid conflict with setting top/left directly
+                    targetThumb.style.transform = 'translate(-50%, -50%)';
+                }
+
+
+                // Start the interval if not already running
+                if (!controlInterval) {
+                    controlInterval = setInterval(sendControlData, 100);
+                }
+            }
+        }
+
+        function handleKeyUp(event) {
+             // Only process keyup if in Manual mode
+            if (controlMode.textContent === 'Automatic') return;
+
+            const key = event.key.toLowerCase();
+            const inputAction = keyMap[key];
+
+            if (inputAction && activeInputs.has(inputAction)) {
+                activeInputs.delete(inputAction);
+
+                // Determine target thumb and movement based on remaining active inputs
+                let targetThumb = null;
+                let moveX = 0;
+                let moveY = 0;
+
+                 // Left Joystick (Pitch/Roll) - Check remaining inputs
+                if (activeInputs.has('pitch-up') && activeInputs.has('roll-left')) { targetThumb = leftThumb; moveX = -1; moveY = -1; }
+                else if (activeInputs.has('pitch-up') && activeInputs.has('roll-right')) { targetThumb = leftThumb; moveX = 1; moveY = -1; }
+                else if (activeInputs.has('pitch-down') && activeInputs.has('roll-left')) { targetThumb = leftThumb; moveX = -1; moveY = 1; }
+                else if (activeInputs.has('pitch-down') && activeInputs.has('roll-right')) { targetThumb = leftThumb; moveX = 1; moveY = 1; }
+                else if (activeInputs.has('pitch-up')) { targetThumb = leftThumb; moveY = -1; }
+                else if (activeInputs.has('pitch-down')) { targetThumb = leftThumb; moveY = 1; }
+                else if (activeInputs.has('roll-left')) { targetThumb = leftThumb; moveX = -1; }
+                else if (activeInputs.has('roll-right')) { targetThumb = leftThumb; moveX = 1; }
+
+                 // Right Joystick (Throttle/Yaw) - Check remaining inputs
+                else if (activeInputs.has('throttle-up') && activeInputs.has('yaw-left')) { targetThumb = rightThumb; moveX = -1; moveY = -1; }
+                else if (activeInputs.has('throttle-up') && activeInputs.has('yaw-right')) { targetThumb = rightThumb; moveX = 1; moveY = -1; }
+                else if (activeInputs.has('throttle-down') && activeInputs.has('yaw-left')) { targetThumb = rightThumb; moveX = -1; moveY = 1; }
+                else if (activeInputs.has('throttle-down') && activeInputs.has('yaw-right')) { targetThumb = rightThumb; moveX = 1; moveY = 1; }
+                else if (activeInputs.has('throttle-up')) { targetThumb = rightThumb; moveY = -1; }
+                else if (activeInputs.has('throttle-down')) { targetThumb = rightThumb; moveY = 1; }
+                else if (activeInputs.has('yaw-left')) { targetThumb = rightThumb; moveX = -1; }
+                else if (activeInputs.has('yaw-right')) { targetThumb = rightThumb; moveX = 1; }
+
+
+                 // Snap the joystick thumb back to center if no relevant keys are pressed,
+                 // otherwise move to the position dictated by the remaining keys.
+                const releasedThumb = thumbMap[inputAction]; // Get the thumb associated with the released key
+                let shouldSnapToCenter = true;
+
+                if (releasedThumb === leftThumb) {
+                    // Check if any other left joystick keys are still pressed
+                    if (activeInputs.has('pitch-up') || activeInputs.has('pitch-down') || activeInputs.has('roll-left') || activeInputs.has('roll-right')) {
+                        shouldSnapToCenter = false;
+                    }
+                } else if (releasedThumb === rightThumb) {
+                     // Check if any other right joystick keys are still pressed
+                    if (activeInputs.has('throttle-up') || activeInputs.has('throttle-down') || activeInputs.has('yaw-left') || activeInputs.has('yaw-right')) {
+                        shouldSnapToCenter = false;
+                    }
+                }
+
+
+                if (shouldSnapToCenter && releasedThumb) {
+                    releasedThumb.style.left = '50%';
+                    releasedThumb.style.top = '50%';
+                    releasedThumb.style.transform = 'translate(-50%, -50%)';
+                } else if (targetThumb && releasedThumb !== targetThumb) {
+                     // If releasing a key moves another thumb, update that thumb's position
+                     const centerX = targetThumb.parentElement.offsetWidth / 2;
+                     const centerY = targetThumb.parentElement.offsetHeight / 2;
+                     const newX = centerX + moveX * maxJoystickDistance;
+                     const newY = centerY + moveY * maxJoystickDistance;
+                     targetThumb.style.left = newX + 'px';
+                     targetThumb.style.top = newY + 'px';
+                     targetThumb.style.transform = 'translate(-50%, -50%)';
+                } else if (targetThumb && releasedThumb === targetThumb) {
+                     // If releasing a key affects the same thumb, update its position based on remaining keys
+                      const centerX = targetThumb.parentElement.offsetWidth / 2;
+                      const centerY = targetThumb.parentElement.offsetHeight / 2;
+                      const newX = centerX + moveX * maxJoystickDistance;
+                      const newY = centerY + moveY * maxJoystickDistance;
+                      targetThumb.style.left = newX + 'px';
+                      targetThumb.style.top = newY + 'px';
+                      targetThumb.style.transform = 'translate(-50%, -50%)';
+                }
+
+
+
+                // If no active inputs, stop the interval and send stop data
+                if (activeInputs.size === 0) {
+                    clearInterval(controlInterval);
+                    controlInterval = null;
+                    // Send one last data packet with current values (should be 0 if no drag)
+                    sendControlData();
+                }
+            }
+        }
+
+
+        function dragStart(event) {
+            // Only allow drag if in Manual mode
+            if (controlMode.textContent === 'Automatic') return;
+
+            event.preventDefault(); // Prevent default behavior
+
+            activeThumb = this; // 'this' refers to the thumb being clicked/touched
+            const dragAction = activeThumb === leftThumb ? 'left-drag' : 'right-drag';
+             activeInputs.add(dragAction);
+
+             // Remove any existing keyboard-induced visual position
+             activeThumb.style.left = '';
+             activeThumb.style.top = '';
+             activeThumb.style.transform = 'translate(-50%, -50%)';
+
+
+            if (event.type.startsWith('touch')) {
+                initialMouseX = event.touches[0].clientX;
+                initialMouseY = event.touches[0].clientY;
+            } else {
+                initialMouseX = event.clientX;
+                initialMouseY = event.clientY;
+            }
+
+            // Get the initial position of the thumb relative to its container
+            const thumbRect = activeThumb.getBoundingClientRect();
+            const containerRect = activeThumb.parentElement.getBoundingClientRect();
+            initialThumbX = thumbRect.left - containerRect.left + thumbRect.width / 2;
+            initialThumbY = thumbRect.top - containerRect.top + thumbRect.height / 2;
+
+             // Start sending data repeatedly if not already running
+            if (!controlInterval) {
+                controlInterval = setInterval(sendControlData, 100); // Send data every 100ms
+            }
+        }
+
+        function drag(event) {
+             // Only allow drag if a thumb is active and in Manual mode
+            if (!activeThumb || controlMode.textContent === 'Automatic') return;
+
+            event.preventDefault(); // Prevent default behavior
+
+            let currentMouseX, currentMouseY;
+            if (event.type.startsWith('touch')) {
+                // Ensure there's a touch point before accessing clientX/Y
+                if (event.touches.length === 0) return;
+                currentMouseX = event.touches[0].clientX;
+                currentMouseY = event.touches[0].clientY;
+            } else {
+                currentMouseX = event.clientX;
+                currentMouseY = event.clientY;
+            }
+
+            const deltaX = currentMouseX - initialMouseX;
+            const deltaY = currentMouseY - initialMouseY;
+
+            let newX = initialThumbX + deltaX;
+            let newY = initialThumbY + deltaY;
+
+            // Keep the thumb within the circular container
+            const centerX = activeThumb.parentElement.offsetWidth / 2;
+            const centerY = activeThumb.parentElement.offsetHeight / 2;
+            const distance = Math.sqrt(Math.pow(newX - centerX, 2) + Math.pow(newY - centerY, 2));
+
+            if (distance > maxJoystickDistance) {
+                const angle = Math.atan2(newY - centerY, newX - centerX);
+                newX = centerX + maxJoystickDistance * Math.cos(angle);
+                newY = centerY + maxJoystickDistance * Math.sin(angle);
+            }
+
+            // Update thumb position
+            activeThumb.style.left = newX + 'px';
+            activeThumb.style.top = newY + 'px';
+
+             // Control values will be calculated in sendControlData based on thumb position
+             // No need to update controlValues here directly from drag
+        }
+
+        function dragEnd() {
+             // Only end drag if a thumb was active and in Manual mode
+            if (!activeThumb || controlMode.textContent === 'Automatic') return;
+
+            const dragAction = activeThumb === leftThumb ? 'left-drag' : 'right-drag';
+            activeInputs.delete(dragAction);
+
+            // Snap thumb back to center
+            activeThumb.style.left = '50%';
+            activeThumb.style.top = '50%';
+            activeThumb.style.transform = 'translate(-50%, -50%)';
+
+             // Reset control values for the released joystick in sendControlData
+            if (activeThumb === leftThumb) {
+                controlValues.pitch = 0;
+                controlValues.roll = 0;
+            } else if (activeThumb === rightThumb) {
+                controlValues.throttle = 0;
+                controlValues.yaw = 0;
+            }
+
+            activeThumb = null; // No thumb is active
+
+             // If no active inputs, stop sending data and send one last packet with reset values
+            if (activeInputs.size === 0) {
+                clearInterval(controlInterval);
+                controlInterval = null;
+                sendControlData();
+            }
+        }
+
+
+        // Function to send control data (placeholder)
+        function sendControlData() {
+            // Only send data if in Manual mode
+            if (controlMode.textContent === 'Automatic') {
+                 // If somehow the interval is still running in Auto mode, clear it
+                 if(controlInterval) {
+                     clearInterval(controlInterval);
+                     controlInterval = null;
+                 }
+                 return;
+            }
+
+            // Reset control values at the start of each interval tick
+            controlValues.throttle = 0;
+            controlValues.yaw = 0;
+            controlValues.pitch = 0;
+            controlValues.roll = 0;
+
+            // Calculate values from active inputs
+            activeInputs.forEach(input => {
+                switch (input) {
+                    case 'left-drag':
+                        // Calculate pitch/roll from left thumb position
+                        const leftCenterX = leftJoystick.offsetWidth / 2;
+                        const leftCenterY = leftJoystick.offsetHeight / 2;
+                        const leftThumbRect = leftThumb.getBoundingClientRect();
+                        const leftJoystickRect = leftJoystick.getBoundingClientRect();
+                        const leftThumbX = leftThumbRect.left - leftJoystickRect.left + leftThumbRect.width / 2;
+                        const leftThumbY = leftThumbRect.top - leftJoystickRect.top + leftThumbRect.height / 2;
+                        const normalizedLeftX = (leftThumbX - leftCenterX) / maxJoystickDistance;
+                        const normalizedLeftY = (leftThumbY - leftCenterY) / maxJoystickDistance;
+                        controlValues.roll = normalizedLeftX * maxPitchRoll;
+                        controlValues.pitch = -normalizedLeftY * maxPitchRoll;
+                        break;
+                    case 'right-drag':
+                        // Calculate throttle/yaw from right thumb position
+                        const rightCenterX = rightJoystick.offsetWidth / 2;
+                        const rightCenterY = rightJoystick.offsetHeight / 2;
+                        const rightThumbRect = rightThumb.getBoundingClientRect();
+                        const rightJoystickRect = rightJoystick.getBoundingClientRect();
+                        const rightThumbX = rightThumbRect.left - rightJoystickRect.left + rightThumbRect.width / 2;
+                        const rightThumbY = rightThumbRect.top - rightJoystickRect.top + rightThumbRect.height / 2;
+                        const normalizedRightX = (rightThumbX - rightCenterX) / maxJoystickDistance;
+                        const normalizedRightY = (rightThumbY - rightCenterY) / maxJoystickDistance;
+                        controlValues.yaw = normalizedRightX * maxYaw;
+                        controlValues.throttle = -normalizedRightY * 100;
+                        break;
+                    case 'pitch-up': controlValues.pitch += controlStep; break;
+                    case 'pitch-down': controlValues.pitch -= controlStep; break;
+                    case 'roll-left': controlValues.roll -= controlStep; break;
+                    case 'roll-right': controlValues.roll += controlStep; break;
+                    case 'throttle-up': controlValues.throttle += controlStep; break;
+                    case 'throttle-down': controlValues.throttle -= controlStep; break;
+                    case 'yaw-left': controlValues.yaw -= controlStep; break;
+                    case 'yaw-right': controlValues.yaw += controlStep; break;
+                }
+            });
+
+            // Clamp control values to their limits
+            controlValues.pitch = Math.max(-maxPitchRoll, Math.min(maxPitchRoll, controlValues.pitch));
+            controlValues.roll = Math.max(-maxPitchRoll, Math.min(maxPitchRoll, controlValues.roll));
+            controlValues.throttle = Math.max(0, Math.min(100, controlValues.throttle));
+            controlValues.yaw = Math.max(-maxYaw, Math.min(maxYaw, controlValues.yaw));
+
+
+            // Update status display
+            updateStatusDisplay();
+
+            const data = {
+                throttle: Math.round(controlValues.throttle),
+                yaw: Math.round(controlValues.yaw),
+                pitch: Math.round(controlValues.pitch),
+                roll: Math.round(controlValues.roll)
+            };
+            console.log('Sending control data:', data);
+            // In a real application, you would send this data via WebSocket or other means
+            // Example: websocket.send(JSON.stringify(data));
+        }
+
+        // Function to update the status display
+        function updateStatusDisplay() {
+             currentPitch.textContent = Math.round(controlValues.pitch) + '°';
+            currentRoll.textContent = Math.round(controlValues.roll) + '°';
+            currentThrottle.textContent = Math.round(controlValues.throttle) + '%';
+            currentYaw.textContent = Math.round(controlValues.yaw) + '°';
+        }
+
+
+        // Simulate receiving status updates (placeholder)
+        function simulateStatusUpdate() {
+             // Simulate battery drain
+            let batteryPercentage = parseInt(currentBattery.textContent.replace('%', ''));
+            batteryPercentage = Math.max(0, batteryPercentage - Math.random() * 0.1); // Even Slower drain
+            currentBattery.textContent = Math.round(batteryPercentage) + '%';
+
+            // Simulate connection status fluctuation occasionally
+            if (Math.random() < 0.002) { // 0.2% chance of change
+                const isConnected = connectionStatus.textContent === 'Connected';
+                connectionStatus.textContent = isConnected ? 'Disconnected' : 'Connected';
+                connectionStatus.style.color = isConnected ? 'var(--danger)' : 'var(--success)';
+            }
+
+             // Simulate mode change occasionally (less likely to change automatically)
+             if (Math.random() < 0.0005 && controlMode.textContent === 'Manual') { // 0.05% chance of change from Manual to Auto
+                 modeToggle.checked = false;
+                 modeToggle.dispatchEvent(new Event('change')); // Trigger the change event
+             } else if (Math.random() < 0.0005 && controlMode.textContent === 'Automatic') { // 0.05% chance of change from Auto to Manual
+                 modeToggle.checked = true;
+                 modeToggle.dispatchEvent(new Event('change')); // Trigger the change event
+             }
+        }
+
+        // Start simulating status updates
+        setInterval(simulateStatusUpdate, 3000); // Update status every 3 seconds
+
+         // Reset controls when the window is closed or beforeunload
+        window.addEventListener('beforeunload', function() {
+            // Send a stop command or reset values to 0 before closing
+             console.log('Window closing, sending stop command.');
+             const stopData = { throttle: 0, yaw: 0, pitch: 0, roll: 0 };
+             console.log('Sending control data:', stopData);
+             // In a real application, send this stop command to the drone
+        });
+
+
+    </script>
+</body>
+</html>

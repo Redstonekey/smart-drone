@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Control Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --danger: #e63946;
+            --success: #2ecc71;
+            --warning: #f9c74f;
+            --dark: #001845;
+            --gray: #8d99ae;
+            --light: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        html, body {
+            background-color: #f1f5f9;
+            color: #334155;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 16px;
+            padding: 16px;
+            height: 100vh;
+            max-height: 100vh;
+        }
+        
+        header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--dark) 0%, #00296b 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: var(--border-radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            box-shadow: var(--shadow);
+        }
+        
+        header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-rows: 3fr 1fr;
+            gap: 16px;
+            height: calc(100vh - 102px); /* Adjusted height calculation based on new header height and padding */
+            overflow-y: auto;
+        }
+        
+        .camera-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .camera-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            background-color: #333;
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 8px 12px;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            color: white;
+            border-radius: 24px;
+            font-size: 14px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        
+        .camera-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 16px;
+        }
+        
+        .control-btn {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 20px;
+        }
+        
+        .control-btn:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+            transform: translateY(-4px);
+        }
+        
+        .telemetry {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            overflow-y: auto;
+            padding: 7px;
+            max-height: 150px;
+        }
+        
+        .telemetry-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: var(--transition);
+            max-height: 100px;
+        }
+        
+        .telemetry-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .telemetry-title {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .telemetry-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .telemetry-unit {
+            font-size: 12px;
+            color: var(--gray);
+            margin-left: 2px;
+        }
+        
+        .sidebar {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 16px;
+            height: calc(100vh - 102px); /* Adjusted height calculation */
+            overflow-y: auto;
+        }
+        
+        .map-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--border-radius);
+        }
+        
+        .emergency-panel {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .emergency-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .emergency-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+        
+        .emergency-btn {
+            padding: 12px;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: var(--danger);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .emergency-btn.land {
+            background-color: var(--warning);
+            color: #333;
+        }
+        
+        .emergency-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .battery-status {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .battery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .battery-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .battery-percentage {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .battery-bar {
+            width: 100%;
+            height: 12px;
+            background-color: #e2e8f0;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+        
+        .battery-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success) 0%, #4ade80 100%);
+            border-radius: 24px;
+            transition: width 0.5s;
+        }
+        
+        .battery-time {
+            margin-top: 8px;
+            text-align: right;
+            font-size: 14px;
+            color: var(--gray);
+        }
+        
+        .status-panel {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--success);
+            box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.2);
+        }
+        
+        .status-indicator.error {
+            background-color: var(--danger);
+            box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.2);
+        }
+        
+        .status-indicator.warning {
+            background-color: var(--warning);
+            box-shadow: 0 0 0 4px rgba(249, 199, 79, 0.2);
+        }
+        
+        .status-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Animation for connection status */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .connected .status-indicator {
+             animation: pulse 2s infinite;
+             background-color: var(--success);
+             box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.4); /* Stronger pulse for connected */
+        }
+
+         .connected .status-text {
+            color: var(--success);
+         }
+
+
+        /* Style for the manual control button */
+        .manual-control-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .manual-control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Connection Status */
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Custom icon size for emergency buttons */
+        .emergency-btn i {
+            font-size: 24px;
+        }
+
+        /* Custom icon size for map marker */
+        .drone-icon i {
+            font-size: 32px;
+            color: var(--primary);
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        
+        /* Record indicator styling */
+        #recording-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        #recording-status i {
+            color: var(--danger);
+            animation: pulse 2s infinite;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                height: auto;
+            }
+        }
+        
+        /* Progress styling for battery */
+        .battery-percentage-bg {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .battery-percentage-icon {
+            font-size: 18px;
+            margin-right: 6px;
+        }
+        
+        /* Mobile UI improvements */
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 8px;
+                gap: 8px;
+            }
+            
+            header {
+                padding: 12px 16px;
+                height: 60px;
+            }
+            
+            header h1 {
+                font-size: 18px;
+            }
+            
+            .telemetry {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+            
+            .control-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .camera-overlay {
+                top: 10px;
+                left: 10px;
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <header>
+            <div class="logo">
+                <h1>Drone Control Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <button class="manual-control-btn" id="manual-control-btn">
+                    <i class="fas fa-gamepad"></i> Manual Control
+                </button>
+                <div class="connection-status connected">
+                    <span class="status-indicator"></span>
+                    <span class="status-text">Connected</span>
+                </div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="camera-container">
+                <img src="http://127.0.0.1:4999/video_feed" alt="Drone Camera Feed" class="camera-feed">
+                <div class="camera-overlay">
+                    <span id="recording-status"><i class="fas fa-circle"></i> REC</span>
+                    <span id="timestamp">00:03:42</span>
+                </div>
+                <div class="camera-controls">
+                    <button class="control-btn" id="take-photo" title="Take Photo">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <button class="control-btn" id="start-record" title="Start Recording">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="control-btn" id="zoom-in" title="Zoom In">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="control-btn" id="zoom-out" title="Zoom Out">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="telemetry">
+                <div class="telemetry-card">
+                    <div class="telemetry-title">Altitude</div>
+                    <div class="telemetry-value" id="altitude">23.4<span class="telemetry-unit">m</span></div>
+                </div>
+                <div class="telemetry-card">
+                    <div class="telemetry-title">Speed</div>
+                    <div class="telemetry-value" id="speed">5.2<span class="telemetry-unit">km/h</span></div>
+                </div>
+                <div class="telemetry-card">
+                    <div class="telemetry-title">Distance</div>
+                    <div class="telemetry-value" id="distance">78<span class="telemetry-unit">m</span></div>
+                </div>
+                <div class="telemetry-card">
+                    <div class="telemetry-title">GPS Signal</div>
+                    <div class="telemetry-value" id="gps-signal">Good</div>
+                </div>
+                <div class="telemetry-card">
+                    <div class="telemetry-title">Flight Time</div>
+                    <div class="telemetry-value" id="flight-time">00:15:22</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <div class="battery-status">
+                <div class="battery-header">
+                    <div class="battery-title">Battery Status</div>
+                    <div class="battery-percentage" id="battery-percentage">
+                        <i class="fas fa-battery-three-quarters battery-percentage-icon"></i>
+                        72%
+                    </div>
+                </div>
+                <div class="battery-bar">
+                    <div class="battery-fill" id="battery-fill" style="width: 72%;"></div>
+                </div>
+                <div class="battery-time">Est. remaining: <span id="battery-time">18 min</span></div>
+                <div class="status-panel">
+                    <div class="status-item">
+                        <div class="status-indicator"></div>
+                        <div class="status-text">GPS</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator"></div>
+                        <div class="status-text">Signal</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator warning"></div>
+                        <div class="status-text">Motors</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator"></div>
+                        <div class="status-text">Sensors</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+            
+            <div class="emergency-panel">
+                <div class="emergency-title">
+                    <i class="fas fa-exclamation-triangle"></i> Emergency Controls
+                </div>
+                <div class="emergency-buttons">
+                    <button class="emergency-btn" id="emergency-stop">
+                        <i class="fas fa-power-off"></i>
+                        Emergency Stop
+                    </button>
+                    <button class="emergency-btn land" id="emergency-land">
+                        <i class="fas fa-arrow-down"></i> Force Land
+                    </button>
+                    <button class="emergency-btn" id="return-home">
+                        <i class="fas fa-home"></i>
+                        Return Home
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    
+    <script>
+        // Initialize test variables
+        const droneData = {
+            battery: 72,
+            altitude: 23.4,
+            speed: 5.2,
+            distance: 78,
+            gpsSignal: 'Good',
+            flightTime: '00:15:22',
+            temperature: 24,
+            batteryTimeRemaining: '18 min',
+            position: {
+                lat: 51.505,
+                lng: -0.09
+            },
+            isRecording: false,
+            timestamp: '00:00:00'
+        };
+        
+        // Initialize map with a modern tile layer
+        const map = L.map('map').setView([droneData.position.lat, droneData.position.lng], 15);
+        
+        
+        // Add drone marker with improved styling
+        const droneIcon = L.divIcon({
+            html: '<i class="fas fa-location-dot"></i>',
+            className: 'drone-icon',
+            iconSize: [32, 32],
+            iconAnchor: [16, 20]
+        });
+        
+        const droneMarker = L.marker([droneData.position.lat, droneData.position.lng], {
+            icon: droneIcon
+        }).addTo(map);
+        
+        // Flight path with improved styling
+        const flightPath = L.polyline([], {
+            color: '#4361ee',
+            weight: 4,
+            opacity: 0.7,
+            lineJoin: 'round'
+        }).addTo(map);
+        
+        // Update drone position (simulated)
+        function updateDronePosition() {
+            // Simulate drone movement
+            droneData.position.lat += (Math.random() - 0.5) * 0.0005;
+            droneData.position.lng += (Math.random() - 0.5) * 0.0005;
+            
+            // Update marker position
+            droneMarker.setLatLng([droneData.position.lat, droneData.position.lng]);
+            
+            // Update flight path
+            flightPath.addLatLng([droneData.position.lat, droneData.position.lng]);
+            
+            // Center map on drone
+            map.panTo([droneData.position.lat, droneData.position.lng]);
+        }
+        
+        // Update telemetry data (simulated)
+        function updateTelemetry() {
+            // Update simulated data
+            droneData.altitude = parseFloat((droneData.altitude + (Math.random() - 0.5) * 0.2).toFixed(1));
+            droneData.speed = parseFloat((droneData.speed + (Math.random() - 0.5) * 0.1).toFixed(1));
+            droneData.distance = Math.round(droneData.distance + (Math.random() - 0.4) * 1);
+            droneData.battery = Math.max(0, parseFloat((droneData.battery - Math.random() * 0.05).toFixed(2)));
+            droneData.temperature = parseFloat((droneData.temperature + (Math.random() - 0.5) * 0.1).toFixed(1));
+            
+            // Calculate remaining battery time
+            const remainingMinutes = Math.round(droneData.battery / 3);
+            droneData.batteryTimeRemaining = `${remainingMinutes} min`;
+            
+            // Update UI elements
+            document.getElementById('altitude').innerHTML = `${droneData.altitude}<span class="telemetry-unit">m</span>`;
+            document.getElementById('speed').innerHTML = `${droneData.speed}<span class="telemetry-unit">km/h</span>`;
+            document.getElementById('distance').innerHTML = `${droneData.distance}<span class="telemetry-unit">m</span>`;
+            document.getElementById('gps-signal').textContent = droneData.gpsSignal;
+            document.getElementById('temperature').innerHTML = `${droneData.temperature}<span class="telemetry-unit">°C</span>`;
+            document.getElementById('battery-percentage').innerHTML = `<i class="fas fa-battery-${getBatteryIcon(droneData.battery)} battery-percentage-icon"></i> ${Math.round(droneData.battery)}%`;
+            document.getElementById('battery-fill').style.width = `${droneData.battery}%`;
+            document.getElementById('battery-time').textContent = droneData.batteryTimeRemaining;
+            
+            // Update battery color based on level
+            const batteryFill = document.getElementById('battery-fill');
+            if (droneData.battery < 20) {
+                batteryFill.style.background = 'linear-gradient(90deg, var(--danger) 0%, #f87171 100%)';
+            } else if (droneData.battery < 40) {
+                batteryFill.style.background = 'linear-gradient(90deg, var(--warning) 0%, #fcd34d 100%)';
+            } else {
+                batteryFill.style.background = 'linear-gradient(90deg, var(--success) 0%, #4ade80 100%)';
+            }
+            
+            // Update flight time
+            const timeParts = droneData.flightTime.split(':');
+            let hours = parseInt(timeParts[0]);
+            let minutes = parseInt(timeParts[1]);
+            let seconds = parseInt(timeParts[2]);
+            seconds++;
+            if (seconds >= 60) {
+                seconds = 0;
+                minutes++;
+                if (minutes >= 60) {
+                    minutes = 0;
+                    hours++;
+                }
+            }
+            droneData.flightTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('flight-time').textContent = droneData.flightTime;
+
+            // Simulate GPS signal status change occasionally
+            if (Math.random() < 0.02) {
+                droneData.gpsSignal = Math.random() < 0.8 ? 'Good' : (Math.random() < 0.5 ? 'Weak' : 'Lost');
+                document.getElementById('gps-signal').textContent = droneData.gpsSignal;
+                
+                // Update the GPS status indicator
+                const statusIndicators = document.querySelectorAll('.status-panel .status-indicator');
+                if (droneData.gpsSignal === 'Good') {
+                    statusIndicators[0].className = 'status-indicator';
+                } else if (droneData.gpsSignal === 'Weak') {
+                    statusIndicators[0].className = 'status-indicator warning';
+                } else {
+                    statusIndicators[0].className = 'status-indicator error';
+                }
+            }
+
+            // Simulate Signal status change occasionally
+             if (Math.random() < 0.03) { // 3% chance of change
+                const signalStatusIndicator = document.querySelectorAll('.status-panel .status-indicator')[1]; // Assuming Signal is the second indicator
+                const signalStatusText = document.querySelectorAll('.status-panel .status-text')[1];
+                const signalStrength = Math.random();
+
+                if (signalStrength > 0.7) {
+                    signalStatusIndicator.className = 'status-indicator'; // Good
+                    signalStatusText.textContent = 'Signal';
+                } else if (signalStrength > 0.3) {
+                     signalStatusIndicator.className = 'status-indicator warning'; // Weak
+                    signalStatusText.textContent = 'Signal';
+                } else {
+                     signalStatusIndicator.className = 'status-indicator error'; // Lost
+                    signalStatusText.textContent = 'Signal';
+                }
+            }
+             // Simulate Motors status change occasionally
+            if (Math.random() < 0.01) { // 1% chance of warning/error
+                const motorsStatusIndicator = document.querySelectorAll('.status-panel .status-indicator')[2]; // Assuming Motors is the third indicator
+                 const motorsStatusText = document.querySelectorAll('.status-panel .status-text')[2];
+                 const motorStatus = Math.random();
+
+                 if (motorStatus > 0.9) {
+                     motorsStatusIndicator.className = 'status-indicator error'; // Error
+                     motorsStatusText.textContent = 'Motors';
+                 } else if (motorStatus > 0.7) {
+                     motorsStatusIndicator.className = 'status-indicator warning'; // Warning
+                     motorsStatusText.textContent = 'Motors';
+                 } else {
+                     motorsStatusIndicator.className = 'status-indicator'; // Good
+                     motorsStatusText.textContent = 'Motors';
+                 }
+            }
+
+             // Simulate Sensors status change occasionally
+            if (Math.random() < 0.015) { // 1.5% chance of warning/error
+                const sensorsStatusIndicator = document.querySelectorAll('.status-panel .status-indicator')[3]; // Assuming Sensors is the fourth indicator
+                 const sensorsStatusText = document.querySelectorAll('.status-panel .status-text')[3];
+                 const sensorStatus = Math.random();
+
+                 if (sensorStatus > 0.85) {
+                     sensorsStatusIndicator.className = 'status-indicator error'; // Error
+                     sensorsStatusText.textContent = 'Sensors';
+                 } else if (sensorStatus > 0.6) {
+                     sensorsStatusIndicator.className = 'status-indicator warning'; // Warning
+                     sensorsStatusText.textContent = 'Sensors';
+                 } else {
+                     sensorsStatusIndicator.className = 'status-indicator'; // Good
+                     sensorsStatusText.textContent = 'Sensors';
+                 }
+            }
+        }
+        
+        // Helper function to get battery icon based on percentage
+        function getBatteryIcon(percentage) {
+            if (percentage < 10) return 'empty';
+            if (percentage < 25) return 'quarter';
+            if (percentage < 50) return 'half';
+            if (percentage < 75) return 'three-quarters';
+            return 'full';
+        }
+        
+        // Handle emergency buttons - Using console.log instead of alert
+        document.getElementById('emergency-stop').addEventListener('click', function() {
+            console.log('EMERGENCY STOP activated! All motors stopped.');
+            // Add logic to stop drone motors
+        });
+        
+        document.getElementById('emergency-land').addEventListener('click', function() {
+            console.log('FORCE LAND initiated! Drone will land immediately.');
+            // Add logic to initiate landing
+        });
+        
+        document.getElementById('return-home').addEventListener('click', function() {
+            console.log('RETURN HOME activated! Drone returning to takeoff point.');
+            // Add logic for return home
+        });
+        
+        // Handle camera controls
+        document.getElementById('take-photo').addEventListener('click', function() {
+            console.log('Photo captured!');
+            // Add visual feedback for photo capture
+            this.classList.add('active');
+            setTimeout(() => {
+                this.classList.remove('active');
+            }, 300);
+        });
+        
+        let isRecording = droneData.isRecording;
+        const recordButton = document.getElementById('start-record');
+        const recordingStatus = document.getElementById('recording-status');
+        
+        recordButton.addEventListener('click', function() {
+            isRecording = !isRecording;
+            // Toggle display of recording status overlay
+            recordingStatus.style.display = isRecording ? 'inline-flex' : 'none';
+            // Change button icon and title based on recording status
+            recordButton.innerHTML = isRecording ? '<i class="fas fa-stop-circle"></i>' : '<i class="fas fa-video"></i>';
+            recordButton.title = isRecording ? 'Stop Recording' : 'Start Recording';
+            
+            if (isRecording) {
+                console.log('Recording started');
+                // Add logic to start recording
+            } else {
+                console.log('Recording stopped');
+                // Add logic to stop recording
+                 // Reset timestamp when recording stops
+                 droneData.timestamp = '00:00:00';
+                 document.getElementById('timestamp').textContent = droneData.timestamp;
+            }
+        });
+        
+        document.getElementById('zoom-in').addEventListener('click', function() {
+            console.log('Zooming in');
+            // Add zoom in logic
+        });
+        
+        document.getElementById('zoom-out').addEventListener('click', function() {
+            console.log('Zooming out');
+            // Add zoom out logic
+        });
+
+        // Handle Manual Control button click
+        document.getElementById('manual-control-btn').addEventListener('click', function() {
+             // Define desired window dimensions
+            const windowWidth = 400;
+            const windowHeight = 800; // Make it taller for vertical orientation
+
+            // Calculate left position to place it on the right side
+            const screenWidth = window.screen.width;
+            const leftPosition = screenWidth - windowWidth - 20; // 20px margin from the right
+
+            // Define window features
+            const windowFeatures = `width=${windowWidth},height=${windowHeight},left=${leftPosition},top=50`; // Example top position
+
+            window.open('/controll', '_blank', windowFeatures);
+        });
+        
+        // Initialize and start simulation
+        function startSimulation() {
+            // Update drone position every 1 second
+            setInterval(updateDronePosition, 1000);
+            
+            // Update telemetry every second
+            setInterval(updateTelemetry, 1000);
+            
+            // Initialize recording status display
+            recordingStatus.style.display = droneData.isRecording ? 'inline-flex' : 'none';
+            document.getElementById('timestamp').textContent = droneData.timestamp;
+             // Initialize record button icon
+            recordButton.innerHTML = droneData.isRecording ? '<i class="fas fa-stop-circle"></i>' : '<i class="fas fa-video"></i>';
+            recordButton.title = droneData.isRecording ? 'Stop Recording' : 'Start Recording';
+
+            // Initial update of telemetry and status indicators
+            updateTelemetry();
+        }
+        
+        // Start simulation when page loads
+        window.onload = startSimulation;
+
+         // Handle map resize
+         window.addEventListener('resize', function() {
+            map.invalidateSize();
+         });
+    </script>
+</body>
+</html>

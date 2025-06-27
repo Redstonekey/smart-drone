@@ -1,0 +1,142 @@
+<mxfile host="65bd71144e">
+    <diagram id="YsCYA1eEa0C3qjxp4XUM" name="Page-1">
+        <mxGraphModel dx="1064" dy="611" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="5" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="3" target="4">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="Pe&lt;span style=&quot;color: rgb(0, 0, 0); font-size: 12px; text-wrap-mode: wrap; background-color: rgb(251, 251, 251);&quot;&gt;rson&lt;/span&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="5">
+                    <mxGeometry x="-0.1833" y="1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="3" value="Notruf" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="365" y="190" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="4" target="6">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="Drohne fliegt los" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="365" y="430" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="6" target="8">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="Ausweichen&lt;div&gt;/&lt;/div&gt;&lt;div&gt;Lenken etc.&lt;/div&gt;" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="385" y="560" width="80" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="8" target="10">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="Angekommen" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="365" y="730" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="10" target="12">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="10" target="14">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="10" target="18">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="Pe&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;rsonen&lt;/span&gt;&lt;div&gt;e&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;rkennung&lt;/span&gt;&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="385" y="840" width="85" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="Abgleichen mit meldung" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="367.5" y="1010" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="14" target="16">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="14" target="22">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="Ja?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="550" y="840" width="85" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="16" target="26">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="Supe&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;rviso&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;r&lt;/span&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="532.5" y="1010" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="18" target="20">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="Nein?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="220" y="840" width="85" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="Falsche&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;r Ala&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;rm?&lt;/span&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="202.5" y="1010" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" style="edgeStyle=none;html=1;" edge="1" parent="1" source="22" target="26">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="GPS O&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;rtung von bet&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;roffene&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;r Pe&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;rson&lt;/span&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="690" y="1010" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="26" target="33">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="530" y="1181.219512195122" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="35" value="Ja?" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="30">
+                    <mxGeometry x="-0.0444" y="-1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="37" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="26" target="36">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="Zielpe&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;rson gefunden?&lt;/span&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="635" y="1120" width="80" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="33" target="39">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="ve&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;rfolgen&lt;/span&gt;" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="425" y="1120" width="80" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" style="edgeStyle=none;html=1;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="36" target="10">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="830" y="830"/>
+                            <mxPoint x="490" y="830"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="36" value="Weite&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;r suchen&lt;/span&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="770" y="1130" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="39" target="41">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" value="Ja" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="42">
+                    <mxGeometry x="-0.4222" y="-2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="45" value="" style="edgeStyle=none;html=1;" edge="1" parent="1" source="39" target="44">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="47" value="Nein" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="45">
+                    <mxGeometry x="-0.0762" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="39" value="Supe&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;r&lt;/span&gt;viso&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;r:&lt;br&gt;Gefah&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;r?&lt;/span&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="220" y="1130" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" value="Behö&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;rden info&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;rmie&lt;/span&gt;&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;ren&lt;/span&gt;" style="rhombus;whiteSpace=wrap;html=1;direction=south;" vertex="1" parent="1">
+                    <mxGeometry x="230" y="1250" width="100" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="44" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;Ansp&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;rechen&lt;/span&gt;&lt;/font&gt;&lt;div&gt;&lt;span style=&quot;font-size: 10px; background-color: transparent; color: rgb(0, 0, 0);&quot;&gt;de&lt;/span&gt;&lt;span style=&quot;font-size: 10px; background-color: transparent; color: rgb(0, 0, 0);&quot;&gt;r pe&lt;/span&gt;&lt;span style=&quot;font-size: 10px; background-color: transparent; color: rgb(0, 0, 0);&quot;&gt;rson&lt;/span&gt;&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="20" y="1110" width="110" height="100" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

@@ -3,10 +3,13 @@ from .motor import motor
 from .gps import GPS
 from colorama import init, Fore, Style
 import time
+import json
 init()
 motor = motor()
 class Drone():
     def __init__(self, name: float, hover_speed: float):
+        with open('config.json', 'r') as config_file:
+            config = json.load(config_file)
         self.name = name
         self.gps = GPS()  # Create GPS instance
         self.position = self.gps.get_position()  # Use instance method
@@ -18,11 +21,11 @@ class Drone():
         self.start_postiony = self.positiony
         self.start_postionz = self.positionz
         self.start_postion = (self.positionx, self.positiony, self.positionz)
-        self.hover_speed = hover_speed
+        self.hover_speed = config['hover_speed'] 
         self.armed = False
         self.landed = True  # Start as landed
         self.flying = False
-        self.ground_distance = 10 # Get from Camera later @deyan
+        self.ground_distance = 10
 
 
     def arm(self):
@@ -224,7 +227,7 @@ class Drone():
             speed_RL = motor.get_speed('RL')
             speed_RR = motor.get_speed('RR')
             speed_FR = motor.get_speed('FR')
-            speed_FL = motor.get_speed('FL')
+            speed_FL = motor.get_speed('Ft')
             while time.time() - start_time < rotate_time:
                 motor.set_FL(speed_FL)
                 motor.set_FR(speed_FR- (motor.get_speed('FR') * 0.3))

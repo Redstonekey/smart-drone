@@ -1,8 +1,5 @@
 # imports
 
-
-# @deyan chatgpt said the arms are called following:
-
 # Front Right (FR)
 
 # Front Left (FL)
@@ -16,8 +13,8 @@ import time
 
 class motor():
     def __init__(self):
-        self.yaw = 0 # Get Yaw from Sensor later @deyan
-        self.pitch = 0 # Get Pitch from Sensor later @deyan
+        self.yaw = 0 # Get Yaw from Sensor later 
+        self.pitch = 0 # Get Pitch from Sensor later
         self.last_print = 0
         self.FR = 0
         self.FL = 0
